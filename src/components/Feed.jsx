@@ -2,11 +2,14 @@ import React, { Fragment } from "react";
 import "../scss/feed.css";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
+import { connect } from "react-redux";
+import { firebase, auth } from "../firebase";
 
 class ReactibookFeed extends React.Component {
   state = {
     isEmojiSelectorActive: false,
     postText: "",
+    userEmail: "",
   };
 
   addEmoji = emoji => {
@@ -26,6 +29,31 @@ class ReactibookFeed extends React.Component {
 
     this.setState({ postText: text });
   };
+
+  handlePublish = () => {
+    console.table(this.props);
+  };
+
+  handleLogout = () => {
+    console.log('pressing');
+    return auth.signOut().then(() => {
+      this.props.onSuccessLogin(null);
+      return this.props.history.replace('/');
+    })
+  };
+
+  componentDidMount() {
+    firebase.auth.onAuthStateChanged(authUser => {
+      console.log('entro aca la wea');
+      if (authUser) {
+        this.props.onSuccessLogin(authUser);
+        return this.setState({ userEmail: authUser['email'] });
+      } else {
+        this.setState({ userEmail: "" });
+        return this.props.history.replace('/');
+      }
+    });
+  }
 
   render() {
     const posts = [1, 2, 3, 4, 5].map(post => {
@@ -92,7 +120,7 @@ class ReactibookFeed extends React.Component {
                   <span>Usuario</span>
                 </a>
                 <div className="navbar-dropdown is-boxed">
-                  <a className="navbar-item">
+                  <a onClick={this.handleLogout} className="navbar-item">
                     Cerrar sesión
                   </a>
                 </div>
@@ -138,7 +166,7 @@ class ReactibookFeed extends React.Component {
                   </div>
                 </div>
                 <div className="control">
-                  <button className="button is-link">Publicar</button>
+                  <button className="button is-link" onClick={this.handlePublish}>Publicar</button>
                 </div>
               </div>
             </div>
@@ -150,4 +178,16 @@ class ReactibookFeed extends React.Component {
   }
 }
 
-export default ReactibookFeed;
+const mapStateToProps = state => {
+  return {
+    authUser: state.sessionState.authUser,
+  }
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onSuccessLogin: authUser => dispatch({type: 'AUTH_USER_SET', authUser}),
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(ReactibookFeed);

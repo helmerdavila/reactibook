@@ -2,6 +2,8 @@ import React from "react";
 import "../scss/login.css";
 import { auth } from "../firebase/index";
 import { Redirect } from "react-router-dom";
+import { connect } from "react-redux";
+import { firebase } from "../firebase";
 
 class ReactibookLogin extends React.Component {
   state = {
@@ -16,8 +18,8 @@ class ReactibookLogin extends React.Component {
     auth
       .loginWithEmailAndPassword(this.state.email, this.state.password)
       .then(authUser => {
-        console.log(authUser);
         if (authUser) {
+          this.props.onSuccessLogin(authUser);
           this.setState({ successAuth: true });
         }
       })
@@ -32,10 +34,20 @@ class ReactibookLogin extends React.Component {
     this.setState({ password: event.target.value });
   };
 
+  componentDidMount() {
+    firebase.auth.onAuthStateChanged(authUser => {
+      if (authUser) {
+        this.props.onSuccessLogin(authUser);
+        return this.setState({ successAuth: true });
+      } else {
+        return this.setState({ successAuth: false });
+      }
+    });
+  }
+
   render() {
-    const { from } = this.props.location.state || { from: { pathname: "/" } };
     if (this.state.successAuth) {
-      return <Redirect to={from} />
+      return <Redirect to="/feed" />
     }
 
     const errorMessage = this.state.errorMessage.length ? (
@@ -84,4 +96,10 @@ class ReactibookLogin extends React.Component {
   }
 }
 
-export default ReactibookLogin;
+const mapDispatchToProps = dispatch => {
+  return {
+    onSuccessLogin: authUser => dispatch({type: 'AUTH_USER_SET', authUser}),
+  }
+};
+
+export default connect(null, mapDispatchToProps)(ReactibookLogin);
