@@ -11,7 +11,7 @@ class App extends Component {
         <Router>
           <Fragment>
            <Route exact path="/" component={ReactibookLogin} />
-           <Route path="/feed" component={ReactibookFeed} />
+           <Route exact path="/feed" component={ReactibookFeed} />
           </Fragment>
         </Router>
       </Fragment>
