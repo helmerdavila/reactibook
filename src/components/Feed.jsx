@@ -60,6 +60,13 @@ class ReactibookFeed extends React.Component {
     });
   };
 
+  handleDeletePost = (postId) => {
+    const result = window.confirm("¿Borrar el post?");
+    if (result) {
+      return db.deletePost(postId).then(() => this.getPosts());
+    }
+  }
+
   getPosts = () => {
     return db.getPosts().then(snapshot => {
       const postObject = snapshot.val();
@@ -104,7 +111,7 @@ class ReactibookFeed extends React.Component {
               <button className="button is-light">Editar</button>
             </div>
             <div className="level-item">
-              <button className="button is-light">Eliminar</button>
+              <button onClick={() => this.handleDeletePost(post['id'])} className="button is-light">Eliminar</button>
             </div>
           </div>
         </div>

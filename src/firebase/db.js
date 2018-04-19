@@ -30,3 +30,7 @@ export const createPost = (uid, email, body, createdAt, isPublic = false) => {
 export const getPosts = () => {
   return db.ref('posts').orderByChild('timestamp').once('value');
 };
+
+export const deletePost = (postId) => {
+  return db.ref(`posts/${postId}`).remove();
+}
