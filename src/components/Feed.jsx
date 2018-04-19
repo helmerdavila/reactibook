@@ -149,7 +149,7 @@ class ReactibookFeed extends React.Component {
       : { display: "none" };
 
     return (
-      <Fragment>
+      <div className="the-feed">
         <Navbar authEmail={email} logout={this.handleLogout}/>
         <section className="section feed-section">
           <div className="card">
@@ -201,7 +201,7 @@ class ReactibookFeed extends React.Component {
           </div>
           {posts}
         </section>
-      </Fragment>
+      </div>
     );
   }
 }

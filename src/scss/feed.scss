@@ -1,11 +1,20 @@
-.feed-section {
-  margin-top: 3em;
-  max-width: 50%;
-  margin-right: auto;
-  margin-left: auto;
+html, body, #root {
+  height: 100%;
+}
 
-  .card-post {
-    margin-top: 1em;
-    margin-bottom: 1em;
+.the-feed {
+  background-color: #e9ebee;
+  height: 100%;
+
+  .feed-section {
+    margin-top: 3em;
+    max-width: 50%;
+    margin-right: auto;
+    margin-left: auto;
+
+    .card-post {
+      margin-top: 1em;
+      margin-bottom: 1em;
+    }
   }
 }
