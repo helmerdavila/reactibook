@@ -1,12 +1,14 @@
 import React from "react";
 import "../scss/login.css";
 import { auth } from "../firebase/index";
+import { Redirect } from "react-router-dom";
 
 class ReactibookLogin extends React.Component {
   state = {
     email: "",
     password: "",
-    errorMessage: ""
+    errorMessage: "",
+    successAuth: false,
   };
 
   handleSubmit = event => {
@@ -15,6 +17,9 @@ class ReactibookLogin extends React.Component {
       .loginWithEmailAndPassword(this.state.email, this.state.password)
       .then(authUser => {
         console.log(authUser);
+        if (authUser) {
+          this.setState({ successAuth: true });
+        }
       })
       .catch(error => this.setState({ errorMessage: error["message"] }));
   };
@@ -28,6 +33,11 @@ class ReactibookLogin extends React.Component {
   };
 
   render() {
+    const { from } = this.props.location.state || { from: { pathname: "/" } };
+    if (this.state.successAuth) {
+      return <Redirect to={from} />
+    }
+
     const errorMessage = this.state.errorMessage.length ? (
       <article className="message is-danger">
         <div className="message-body">{this.state.errorMessage}</div>
