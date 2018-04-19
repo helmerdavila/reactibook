@@ -1,0 +1,10 @@
+.form-container {
+  background-color: #3273dc;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center; }
+  .form-container .card {
+    width: 40%;
+    margin-right: auto;
+    margin-left: auto; }

@@ -1,0 +1,15 @@
+@import "./variables";
+
+.form-container {
+  background-color: $facebook-color;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+
+  .card {
+    width: 40%;
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
