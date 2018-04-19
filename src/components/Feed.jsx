@@ -4,14 +4,16 @@ import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import { connect } from "react-redux";
 import { auth, db } from "../firebase";
+import { Redirect } from "react-router-dom";
 import * as moment from "moment";
+import Navbar from "./Navbar";
 
 class ReactibookFeed extends React.Component {
   state = {
     isEmojiSelectorActive: false,
     postText: "",
     isPublic: false,
-    posts: []
+    posts: [],
   };
 
   addEmoji = emoji => {
@@ -56,7 +58,7 @@ class ReactibookFeed extends React.Component {
   handleLogout = () => {
     return auth.signOut().then(() => {
       this.props.changeUserState(null);
-      return this.props.history.replace("/");
+      return this.setState({ posts: [] });
     });
   };
 
@@ -86,6 +88,10 @@ class ReactibookFeed extends React.Component {
 
   render() {
     const email = this.props.authUser !== null ? this.props.authUser["email"] : null;
+
+    if (email === null) {
+      return <Redirect to="/"/>
+    }
 
     const posts = this.state.posts.map(post => {
       let timeAgo;
@@ -144,28 +150,7 @@ class ReactibookFeed extends React.Component {
 
     return (
       <Fragment>
-        <nav className="navbar is-fixed-top is-link">
-          <div className="navbar-brand">
-            <a className="navbar-item is-uppercase">Reactibook</a>
-          </div>
-          <div className="navbar-menu">
-            <div className="navbar-end">
-              <div className="navbar-item has-dropdown is-hoverable">
-                <a className="navbar-link">
-                  <span className="icon">
-                    <i className="fas fa-fw fa-user" />
-                  </span>
-                  <span>{email}</span>
-                </a>
-                <div className="navbar-dropdown is-boxed">
-                  <a onClick={this.handleLogout} className="navbar-item">
-                    Cerrar sesión
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </nav>
+        <Navbar authEmail={email} logout={this.handleLogout}/>
         <section className="section feed-section">
           <div className="card">
             <div className="card-content">
@@ -183,7 +168,7 @@ class ReactibookFeed extends React.Component {
                 <div className="control">
                   <button className="button" onClick={this.toggleEmoji}>
                     <span className="icon">
-                      <i className="fas fa-fw fa-smile" />
+                      <i className="far fa-fw fa-smile" />
                     </span>
                   </button>
                   <Picker

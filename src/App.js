@@ -14,7 +14,7 @@ const PrivateRoute = ({ email, component: Component, ...rest }) => {
       {...rest}
       render={props =>
         isAuth ? (
-          <Component {...props} />
+          <Component />
         ) : (
           <Redirect
             to={{
@@ -31,7 +31,7 @@ const PrivateRoute = ({ email, component: Component, ...rest }) => {
 class App extends Component {
   state = {
     userEmail: "",
-  }
+  };
 
   componentDidMount() {
     firebase.auth.onAuthStateChanged(authUser => {
@@ -52,7 +52,8 @@ class App extends Component {
       <Fragment>
         <Router>
           <Fragment>
-            <Route exact path="/" render={() => <ReactibookLogin email={email}/>} />
+            {/*<Route exact path="/" render={() => <ReactibookLogin email={email}/>} />*/}
+            <Route exact path="/" component={ReactibookLogin} />
             <PrivateRoute path="/feed" email={email} component={ReactibookFeed} />
           </Fragment>
         </Router>

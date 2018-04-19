@@ -35,7 +35,7 @@ class ReactibookLogin extends React.Component {
   };
 
   componentDidUpdate() {
-    if (this.props.email) {
+    if (this.props.authUser !== null) {
       this.setState({ logged: true });
     }
   }
