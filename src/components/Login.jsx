@@ -7,7 +7,7 @@ class ReactibookLogin extends React.Component {
       <div className="form-container">
         <div className="card">
           <div className="card-header">
-            <h3 className="card-header-title">Iniciar sesión</h3>
+            <h3 className="card-header-title is-centered">Reactibook</h3>
           </div>
           <div className="card-content">
           <form className="login-form">

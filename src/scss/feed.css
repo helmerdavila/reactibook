@@ -1,0 +1,7 @@
+.feed-section {
+  max-width: 50%;
+  margin-right: auto;
+  margin-left: auto; }
+  .feed-section .card-post {
+    margin-top: 1em;
+    margin-bottom: 1em; }

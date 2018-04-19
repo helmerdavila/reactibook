@@ -1,11 +1,15 @@
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 import './App.css';
-import ReactibookLogin from "./components/Login";
+//import ReactibookLogin from "./components/Login";
+import ReactibookFeed from "./components/Feed";
 
 class App extends Component {
   render() {
     return (
-      <ReactibookLogin/>
+      <Fragment>  
+        {/* <ReactibookLogin/> */}
+        <ReactibookFeed/>
+      </Fragment>  
     );
   }
 }
