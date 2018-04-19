@@ -1,6 +1,6 @@
 import React from "react";
 import "../scss/login.css";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { Redirect } from "react-router-dom";
 import { connect } from "react-redux";
 
@@ -19,7 +19,8 @@ class ReactibookLogin extends React.Component {
       .then(authUser => {
         if (authUser) {
           this.props.onSuccessLogin(authUser);
-          this.setState({ logged: true });
+          db.saveUserData(authUser['uid'], authUser['email'])
+            .then(() => this.setState({ logged: true }));
         }
       })
       .catch(error => this.setState({ errorMessage: error["message"] }));

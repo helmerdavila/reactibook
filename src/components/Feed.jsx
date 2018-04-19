@@ -40,10 +40,6 @@ class ReactibookFeed extends React.Component {
     })
   };
 
-  componentDidMount() {
-    console.log('entro aca la wea');
-  }
-
   render() {
     const email = this.props.authUser !== null ? this.props.authUser['email'] : null;
 
