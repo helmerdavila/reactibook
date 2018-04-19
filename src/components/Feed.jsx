@@ -3,12 +3,15 @@ import "../scss/feed.css";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import { connect } from "react-redux";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import * as moment from "moment";
 
 class ReactibookFeed extends React.Component {
   state = {
     isEmojiSelectorActive: false,
     postText: "",
+    isPublic: false,
+    posts: []
   };
 
   addEmoji = emoji => {
@@ -29,23 +32,60 @@ class ReactibookFeed extends React.Component {
     this.setState({ postText: text });
   };
 
+  handleChangePrivacy = event => {
+    const selected = event.target.value;
+
+    if (selected === "0") {
+      this.setState({ isPublic: false });
+    } else if (selected === "1") {
+      this.setState({ isPublic: true });
+    }
+  };
+
   handlePublish = () => {
-    console.table(this.props);
+    const { email, uid } = this.props.authUser;
+    const content = this.state.postText;
+    const isPublic = this.state.isPublic;
+    const createdAt = moment().format("x");
+    db.createPost(uid, email, content, createdAt, isPublic).then(() => {
+      this.setState({ postText: "" });
+      this.getPosts();
+    });
   };
 
   handleLogout = () => {
     return auth.signOut().then(() => {
       this.props.changeUserState(null);
-      return this.props.history.replace('/');
-    })
+      return this.props.history.replace("/");
+    });
   };
 
-  render() {
-    const email = this.props.authUser !== null ? this.props.authUser['email'] : null;
+  getPosts = () => {
+    return db.getPosts().then(snapshot => {
+      const postObject = snapshot.val();
+      const posts = Object.keys(postObject).map(postId => {
+        return {
+          id: postId,
+          ...postObject[postId]
+        };
+      });
+      this.setState({ posts });
+    });
+  };
 
-    const posts = [1, 2, 3, 4, 5].map(post => {
+  componentDidMount() {
+    this.getPosts();
+  }
+
+  render() {
+    const email =
+      this.props.authUser !== null ? this.props.authUser["email"] : null;
+
+    const posts = this.state.posts.map(post => {
+      let timeAgo;
       let image;
-      if (post % 2 === 0) {
+
+      if (post["image"]) {
         image = (
           <figure className="image is-square">
             <img src="http://placekitten.com/g/200" alt="" />
@@ -53,21 +93,21 @@ class ReactibookFeed extends React.Component {
         );
       }
 
+      if (post["createdAt"]) {
+        timeAgo = moment(parseInt(post["createdAt"], 10)).fromNow();
+      }
+
       return (
-        <div key={post} className="card card-post">
+        <div key={post["id"]} className="card card-post">
           <div className="card-content">
             <article className="media">
               <div className="media-content">
                 {image}
                 <div className="content">
                   <p>
-                    <strong>John Smith</strong> <small>@johnsmith</small>{" "}
-                    <small>31m</small>
+                    <strong>{post["author"]}</strong> <small>{timeAgo}</small>
                     <br />
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Proin ornare magna eros, eu pellentesque tortor vestibulum
-                    ut. Maecenas non massa sem. Etiam finibus odio quis feugiat
-                    facilisis.
+                    {post["body"]}
                   </p>
                 </div>
                 <div className="level">
@@ -143,17 +183,22 @@ class ReactibookFeed extends React.Component {
                 </div>
                 <div className="control has-icons-left">
                   <div className="select">
-                    <select>
-                      <option>Amigos</option>
-                      <option>Público</option>
+                    <select onChange={this.handleChangePrivacy}>
+                      <option value="0">Amigos</option>
+                      <option value="1">Público</option>
                     </select>
                   </div>
                   <div className="icon is-small is-left">
-                    <i className="fas fa-fw fa-unlock-alt"></i>
+                    <i className="fas fa-fw fa-unlock-alt" />
                   </div>
                 </div>
                 <div className="control">
-                  <button className="button is-link" onClick={this.handlePublish}>Publicar</button>
+                  <button
+                    className="button is-link"
+                    onClick={this.handlePublish}
+                  >
+                    Publicar
+                  </button>
                 </div>
               </div>
             </div>
@@ -167,14 +212,14 @@ class ReactibookFeed extends React.Component {
 
 const mapStateToProps = state => {
   return {
-    authUser: state.sessionState.authUser,
-  }
+    authUser: state.sessionState.authUser
+  };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    changeUserState: authUser => dispatch({type: 'AUTH_USER_SET', authUser}),
-  }
+    changeUserState: authUser => dispatch({ type: "AUTH_USER_SET", authUser })
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ReactibookFeed);
