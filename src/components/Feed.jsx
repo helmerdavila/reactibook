@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 import "../scss/feed.css";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
@@ -7,6 +7,7 @@ import { auth, db } from "../firebase";
 import { Redirect } from "react-router-dom";
 import * as moment from "moment";
 import Navbar from "./Navbar";
+import Post from "./Post";
 
 class ReactibookFeed extends React.Component {
   state = {
@@ -14,6 +15,10 @@ class ReactibookFeed extends React.Component {
     postText: "",
     isPublic: false,
     posts: [],
+    styles: {
+      showEmojiPanel: { width: 338, position: "absolute", top: "2.2em", left: 0, zIndex: 10 },
+      hideEmojiPanel: { display: "none" },
+    }
   };
 
   addEmoji = emoji => {
@@ -67,7 +72,7 @@ class ReactibookFeed extends React.Component {
     if (result) {
       return db.deletePost(postId).then(() => this.getPosts());
     }
-  }
+  };
 
   getPosts = () => {
     return db.getPosts().then(snapshot => {
@@ -93,60 +98,9 @@ class ReactibookFeed extends React.Component {
       return <Redirect to="/"/>
     }
 
-    const posts = this.state.posts.map(post => {
-      let timeAgo;
-      let image;
-      let isAuthUserPost = post['uid'] === this.props.authUser['uid'];
+    const posts = this.state.posts.map(post => <Post key={post["id"]} post={post} deletePost={this.handleDeletePost}/>);
 
-      if (post["image"]) {
-        image = (
-          <figure className="image is-square">
-            <img src="http://placekitten.com/g/200" alt="" />
-          </figure>
-        );
-      }
-
-      if (post["createdAt"]) {
-        timeAgo = moment(parseInt(post["createdAt"], 10)).fromNow();
-      }
-
-      const buttons = isAuthUserPost ? (
-        <div className="level">
-          <div className="level-left">
-            <div className="level-item">
-              <button className="button is-light">Editar</button>
-            </div>
-            <div className="level-item">
-              <button onClick={() => this.handleDeletePost(post['id'])} className="button is-light">Eliminar</button>
-            </div>
-          </div>
-        </div>
-      ) : null;
-
-      return (
-        <div key={post["id"]} className="card card-post">
-          <div className="card-content">
-            <article className="media">
-              <div className="media-content">
-                {image}
-                <div className="content">
-                  <p>
-                    <strong>{post["author"]}</strong> <small>{timeAgo}</small>
-                    <br />
-                    {post["body"]}
-                  </p>
-                </div>
-                {buttons}
-              </div>
-            </article>
-          </div>
-        </div>
-      );
-    });
-
-    const emojiSelectorStyles = this.state.isEmojiSelectorActive
-      ? { width: 338, position: "absolute", top: "2.2em", left: 0, zIndex: 10 }
-      : { display: "none" };
+    const emojiSelectorStyles = this.state.isEmojiSelectorActive ? this.state.styles.showEmojiPanel : this.state.styles.hideEmojiPanel;
 
     return (
       <div className="the-feed">
