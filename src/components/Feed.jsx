@@ -39,7 +39,7 @@ class ReactibookFeed extends React.Component {
       }
 
       return (
-        <div className="card card-post">
+        <div key={post} className="card card-post">
           <div className="card-content">
             <article className="media">
               <div className="media-content">
