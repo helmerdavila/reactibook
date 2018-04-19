@@ -78,12 +78,12 @@ class ReactibookFeed extends React.Component {
   }
 
   render() {
-    const email =
-      this.props.authUser !== null ? this.props.authUser["email"] : null;
+    const email = this.props.authUser !== null ? this.props.authUser["email"] : null;
 
     const posts = this.state.posts.map(post => {
       let timeAgo;
       let image;
+      let isAuthUserPost = post['uid'] === this.props.authUser['uid'];
 
       if (post["image"]) {
         image = (
@@ -96,6 +96,19 @@ class ReactibookFeed extends React.Component {
       if (post["createdAt"]) {
         timeAgo = moment(parseInt(post["createdAt"], 10)).fromNow();
       }
+
+      const buttons = isAuthUserPost ? (
+        <div className="level">
+          <div className="level-left">
+            <div className="level-item">
+              <button className="button is-light">Editar</button>
+            </div>
+            <div className="level-item">
+              <button className="button is-light">Eliminar</button>
+            </div>
+          </div>
+        </div>
+      ) : null;
 
       return (
         <div key={post["id"]} className="card card-post">
@@ -110,16 +123,7 @@ class ReactibookFeed extends React.Component {
                     {post["body"]}
                   </p>
                 </div>
-                <div className="level">
-                  <div className="level-left">
-                    <div className="level-item">
-                      <button className="button is-light">Editar</button>
-                    </div>
-                    <div className="level-item">
-                      <button className="button is-light">Eliminar</button>
-                    </div>
-                  </div>
-                </div>
+                {buttons}
               </div>
             </article>
           </div>
