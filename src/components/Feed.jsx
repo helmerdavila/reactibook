@@ -3,13 +3,12 @@ import "../scss/feed.css";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import { connect } from "react-redux";
-import { firebase, auth } from "../firebase";
+import { auth } from "../firebase";
 
 class ReactibookFeed extends React.Component {
   state = {
     isEmojiSelectorActive: false,
     postText: "",
-    userEmail: "",
   };
 
   addEmoji = emoji => {
@@ -35,27 +34,19 @@ class ReactibookFeed extends React.Component {
   };
 
   handleLogout = () => {
-    console.log('pressing');
     return auth.signOut().then(() => {
-      this.props.onSuccessLogin(null);
+      this.props.changeUserState(null);
       return this.props.history.replace('/');
     })
   };
 
   componentDidMount() {
-    firebase.auth.onAuthStateChanged(authUser => {
-      console.log('entro aca la wea');
-      if (authUser) {
-        this.props.onSuccessLogin(authUser);
-        return this.setState({ userEmail: authUser['email'] });
-      } else {
-        this.setState({ userEmail: "" });
-        return this.props.history.replace('/');
-      }
-    });
+    console.log('entro aca la wea');
   }
 
   render() {
+    const email = this.props.authUser !== null ? this.props.authUser['email'] : null;
+
     const posts = [1, 2, 3, 4, 5].map(post => {
       let image;
       if (post % 2 === 0) {
@@ -117,7 +108,7 @@ class ReactibookFeed extends React.Component {
                   <span className="icon">
                     <i className="fas fa-fw fa-user" />
                   </span>
-                  <span>Usuario</span>
+                  <span>{email}</span>
                 </a>
                 <div className="navbar-dropdown is-boxed">
                   <a onClick={this.handleLogout} className="navbar-item">
@@ -186,7 +177,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    onSuccessLogin: authUser => dispatch({type: 'AUTH_USER_SET', authUser}),
+    changeUserState: authUser => dispatch({type: 'AUTH_USER_SET', authUser}),
   }
 };
 
