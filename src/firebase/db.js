@@ -7,7 +7,6 @@ export const saveUserData = (userId, email) => {
 };
 
 export const createPost = (uid, email, body, createdAt, isPublic = false) => {
-  // A post entry.
   const postData = {
     uid,
     author: email,
@@ -16,10 +15,8 @@ export const createPost = (uid, email, body, createdAt, isPublic = false) => {
     isPublic,
   };
 
-  // Get a key for a new Post.
   const postIdKey = db.ref().child('posts').push().key;
 
-  // Write the new post's data simultaneously in the posts list and the user's post list.
   const updates = {};
   updates['/posts/' + postIdKey] = postData;
   updates['/user-posts/' + uid + '/' + postIdKey] = postData;
@@ -31,6 +28,28 @@ export const getPosts = () => {
   return db.ref('posts').orderByChild('timestamp').once('value');
 };
 
-export const deletePost = (postId) => {
-  return db.ref(`posts/${postId}`).remove();
-}
+export const getPost = (postId) => {
+  return db.ref(`posts/${postId}`).once('value');
+};
+
+export const deletePost = (postId, userId) => {
+  return Promise.all([
+    db.ref(`posts/${postId}`).remove(),
+    db.ref(`user-posts/${userId}/${postId}`).remove()
+  ]);
+};
+
+export const updatePost = (post, body) => {
+  const postData = {
+    uid: post['uid'],
+    author: post['author'],
+    body,
+    createdAt: post['createdAt'],
+    isPublic: post['isPublic'],
+  };
+  const updates = {};
+  updates['/posts/' + post['id']] = postData;
+  updates['/user-posts/' + post['uid'] + '/' + post['id']] = postData;
+
+  return db.ref().update(updates);
+};

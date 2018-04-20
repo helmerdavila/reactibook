@@ -70,7 +70,7 @@ class ReactibookFeed extends React.Component {
   handleDeletePost = (postId) => {
     const result = window.confirm("¿Borrar el post?");
     if (result) {
-      return db.deletePost(postId).then(() => this.getPosts());
+      return db.deletePost(postId, this.props.authUser['uid']).then(() => this.getPosts());
     }
   };
 
@@ -98,9 +98,14 @@ class ReactibookFeed extends React.Component {
       return <Redirect to="/"/>
     }
 
-    const posts = this.state.posts.map(post => <Post key={post["id"]} post={post} deletePost={this.handleDeletePost}/>);
-
     const emojiSelectorStyles = this.state.isEmojiSelectorActive ? this.state.styles.showEmojiPanel : this.state.styles.hideEmojiPanel;
+
+    const posts = this.state.posts.map(post => (
+      <Post key={post["id"]}
+            post={post}
+            styles={this.state.styles}
+            deletePost={this.handleDeletePost}/>
+    )).reverse();
 
     return (
       <div className="the-feed">
