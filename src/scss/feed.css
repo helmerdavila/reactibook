@@ -4,6 +4,8 @@ html, body, #root {
 .the-feed {
   background-color: #e9ebee;
   height: 100%; }
+  .the-feed .tabs {
+    margin-top: 1em; }
   .the-feed .feed-section {
     margin-top: 3em;
     max-width: 50%;

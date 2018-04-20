@@ -15,10 +15,12 @@ class ReactibookFeed extends React.Component {
     postText: "",
     isPublic: false,
     posts: [],
+    postsOriginal: [],
     styles: {
       showEmojiPanel: { width: 338, position: "absolute", top: "2.2em", left: 0, zIndex: 10 },
       hideEmojiPanel: { display: "none" },
-    }
+    },
+    activePostsToggle: 1,
   };
 
   addEmoji = emoji => {
@@ -83,8 +85,21 @@ class ReactibookFeed extends React.Component {
           ...postObject[postId]
         };
       });
-      this.setState({ posts });
+      this.setState({ posts, postsOriginal: posts });
     });
+  };
+
+  filterPosts = number => {
+    let posts = this.state.postsOriginal;
+    switch (number) {
+      case 2:
+        posts = posts.filter(post => post['isPublic'] && post['uid'] === this.props.authUser['uid']);
+        break;
+      case 3:
+        posts = posts.filter(post => post['isPublic'] === false && post['uid'] === this.props.authUser['uid']);
+        break;
+    }
+    this.setState({ posts, activePostsToggle: number });
   };
 
   componentDidMount() {
@@ -158,6 +173,34 @@ class ReactibookFeed extends React.Component {
                 </div>
               </div>
             </div>
+          </div>
+          <div className="tabs is-fullwidth">
+            <ul>
+              <li className={this.state.activePostsToggle === 1 ? 'is-active' : null}>
+                <a onClick={() => this.filterPosts(1)}>
+                  <span className="icon is-small">
+                    <i className="fas fa-fw fa-rss-square"/>
+                  </span>
+                  <span>Todos</span>
+                </a>
+              </li>
+              <li className={this.state.activePostsToggle === 2 ? 'is-active' : null}>
+                <a onClick={() => this.filterPosts(2)}>
+                  <span className="icon is-small">
+                    <i className="fas fa-fw fa-globe"/>
+                  </span>
+                  <span>Públicos</span>
+                </a>
+              </li>
+              <li className={this.state.activePostsToggle === 3 ? 'is-active' : null}>
+                <a onClick={() => this.filterPosts(3)}>
+                  <span className="icon is-small">
+                    <i className="fas fa-fw fa-users"/>
+                  </span>
+                  <span>Amigos</span>
+                </a>
+              </li>
+            </ul>
           </div>
           {posts}
         </section>
