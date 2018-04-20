@@ -120,7 +120,7 @@ class ReactibookPost extends React.Component {
         {image}
         <div className="content">
           <p>
-            <strong>{post["author"]}</strong> <small>{timeAgo}</small>
+            <strong>{post["author"]}</strong> <small>{timeAgo}</small> <span className="tag">{post["isPublic"] ? "Público" : "Amigos"}</span>
             <br />
             {this.state.postText}
           </p>

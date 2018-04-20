@@ -151,6 +151,7 @@ class ReactibookFeed extends React.Component {
                   <button
                     className="button is-link"
                     onClick={this.handlePublish}
+                    disabled={this.state.postText.length === 0}
                   >
                     Publicar
                   </button>
