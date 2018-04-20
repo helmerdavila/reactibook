@@ -6,10 +6,11 @@ export const saveUserData = (userId, email) => {
   });
 };
 
-export const createPost = (uid, email, body, createdAt, isPublic = false) => {
+export const createPost = (uid, email, imageUrl, body, createdAt, isPublic = false) => {
   const postData = {
     uid,
     author: email,
+    imageUrl,
     body,
     createdAt,
     isPublic,
@@ -43,6 +44,7 @@ export const updatePost = (post, body) => {
   const postData = {
     uid: post['uid'],
     author: post['author'],
+    imageUrl: post['imageUrl'],
     body,
     createdAt: post['createdAt'],
     isPublic: post['isPublic'],

@@ -50,10 +50,10 @@ class ReactibookPost extends React.Component {
     let image;
     let isAuthUserPost = post['uid'] === this.props.authUser['uid'];
 
-    if (post["image"]) {
+    if (post["imageUrl"]) {
       image = (
         <figure className="image is-square">
-          <img src="http://placekitten.com/g/200" alt="" />
+          <img src={post["imageUrl"]} alt="" />
         </figure>
       );
     }

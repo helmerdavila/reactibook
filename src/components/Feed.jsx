@@ -3,7 +3,7 @@ import "../scss/feed.css";
 import "emoji-mart/css/emoji-mart.css";
 import { Picker } from "emoji-mart";
 import { connect } from "react-redux";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
 import { Redirect } from "react-router-dom";
 import * as moment from "moment";
 import Navbar from "./Navbar";
@@ -21,6 +21,7 @@ class ReactibookFeed extends React.Component {
       hideEmojiPanel: { display: "none" },
     },
     activePostsToggle: 1,
+    selectedImage: null,
   };
 
   addEmoji = emoji => {
@@ -51,12 +52,19 @@ class ReactibookFeed extends React.Component {
     }
   };
 
-  handlePublish = () => {
+  handlePublish = async () => {
     const { email, uid } = this.props.authUser;
     const content = this.state.postText;
     const isPublic = this.state.isPublic;
     const createdAt = moment().format("x");
-    db.createPost(uid, email, content, createdAt, isPublic).then(() => {
+    let imageUrl;
+    if (this.state.selectedImage) {
+      const snapshot = await storage.uploadImage(this.state.selectedImage, this.props.authUser['uid']);
+      imageUrl = snapshot['downloadURL'];
+      await this.setState({ selectedImage: null });
+    }
+
+    db.createPost(uid, email, imageUrl, content, createdAt, isPublic).then(() => {
       this.setState({ postText: "" });
       this.getPosts();
     });
@@ -98,8 +106,14 @@ class ReactibookFeed extends React.Component {
       case 3:
         posts = posts.filter(post => post['isPublic'] === false && post['uid'] === this.props.authUser['uid']);
         break;
+      default: break;
     }
     this.setState({ posts, activePostsToggle: number });
+  };
+
+  handleChangeFile = event => {
+    const file = event.target.files[0];
+    this.setState({ selectedImage: file });
   };
 
   componentDidMount() {
@@ -136,6 +150,22 @@ class ReactibookFeed extends React.Component {
                     value={this.state.postText}
                     onChange={this.typeText}
                   />
+                </div>
+              </div>
+              <div className="field">
+                <div className="file has-name is-right">
+                  <label className="file-label">
+                    <input onChange={this.handleChangeFile} className="file-input" type="file" accept="image/x-png,image/jpeg"/>
+                    <span className="file-cta">
+                      <span className="file-icon">
+                        <i className="fas fa-upload"/>
+                      </span>
+                      <span className="file-label">
+                        Escoger archivo
+                      </span>
+                    </span>
+                    <span className="file-name">{ this.state.selectedImage ? this.state.selectedImage['name'] : "Seleccione una imagen" }</span>
+                  </label>
                 </div>
               </div>
               <div className="field is-grouped is-grouped-right">
